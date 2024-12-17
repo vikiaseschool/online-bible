@@ -78,7 +78,6 @@
         .chapter h3 {
             margin-top: 0;
             color: #2d6a4f;
-             text-align: center;
         }
 
         .verse {
@@ -87,14 +86,24 @@
         }
 
         .login {
-            margin-top: 20px;
+            margin-top: 30px;
             text-align: center;
         }
 
         .login a {
             text-decoration: none;
-            color: #2d6a4f;
+            color: white;
+            background-color: #2d6a4f;
+            padding: 10px 20px;
             font-size: 18px;
+            border-radius: 5px;
+            display: inline-block;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        .login a:hover {
+            background-color: #1e4d37;
         }
     </style>
     <script>
@@ -110,16 +119,22 @@
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
-                    displayBibleText(data.text);
+                    displayBibleText(data.text, book);
                 })
                 .catch(error => {
                     document.getElementById('bible-text').innerText = 'Error fetching Bible text.';
                 });
         }
 
-        function displayBibleText(bibleData) {
+        function displayBibleText(bibleData, bookName) {
             const bibleTextDiv = document.getElementById('bible-text');
-            bibleTextDiv.innerHTML = ''; // Clear previous content
+            const bookTitle = document.getElementById('book-title');
+
+            // Set the book title
+            bookTitle.innerText = bookName;
+
+            // Clear previous content
+            bibleTextDiv.innerHTML = '';
 
             // Loop through chapters and verses
             bibleData.chapters.forEach(chapter => {
@@ -150,16 +165,15 @@
                 <li><a href="javascript:void(0);" onclick="fetchBibleText('{{ book }}')">{{ book }}</a></li>
             {% endfor %}
         </ul>
+        <div class="login">
+            <a href="/login">Login</a>
+        </div>
     </div>
 
     <div class="content">
-        <h1>Read the Bible</h1>
+        <h1 id="book-title">Read the Virtual Bible</h1>
         <div class="bible-text" id="bible-text">
             <p>Select a book to read.</p>
-        </div>
-
-        <div class="login">
-            <a href="/login">Login</a>
         </div>
     </div>
 </body>
