@@ -46,27 +46,56 @@ def get_verse_for_today():
 def load_bible():
     with open('full_bible.json', 'r', encoding='utf-8') as file:
         return json.load(file)
+
+
+def clean_text(data):
+    for chapter in data.get("chapters", []):
+        for verse in chapter.get("verses", []):
+            verse["text"] = verse["text"].replace(";", "")
+            verse["text"] = verse["text"].replace("’", "")
+            verse["text"] = verse["text"].replace("‘", "")
+            verse["text"] = verse["text"].replace("”", "")
+            verse["text"] = verse["text"].replace("“", "")
+            verse["text"] = verse["text"].replace("⌞", "")
+            verse["text"] = verse["text"].replace("⌜", "")
+            verse["text"] = verse["text"].replace("⌟", "")
+            verse["text"] = verse["text"].replace("⌝", "")
+            verse["text"] = verse["text"].replace("—", "")
+    return data
 def get_bible_section(book, chapter=None, verse=None):
     bible_data = load_bible()
 
     for bible_book in bible_data['books']:
         if bible_book['name'].lower() == book.lower():
             if chapter is None:
-                return bible_book
+                return clean_text(bible_book)
             else:
                 for ch in bible_book['chapters']:
                     if ch['chapter'] == chapter:
                         if verse is None:
-                            return ch
+                            return clean_text({'chapters': [ch]})
                         else:
                             for v in ch['verses']:
                                 if v['verse'] == verse:
+                                    v["text"] = v["text"].replace(";", "").replace("’", "").replace("‘", "").replace(
+                                        "”", "").replace("“", "").replace("⌞", "").replace("⌜", "").replace("⌟",
+                                                                                                            "").replace(
+                                        "⌝", "").replace("—", "")
+
                                     return v
     return 'Not Found.'
+
 
 def get_book_names_from_file():
     with open('full_bible.json', 'r', encoding='utf-8') as f:
         bible_data = json.load(f)
     book_names = [book['name'] for book in bible_data['books']]
-    return book_names
+    custom_order = [
+        'Genesis', 'Exodus', 'Psalms', 'Isaiah', 'Deuteronomy',
+        'Matthew', 'John', 'Acts', 'Romans', 'Revelation of John'
+    ]
+    first_ten = [book for book in custom_order if book in book_names]
+    remaining_books = [book for book in book_names if book not in first_ten]
+    reordered_books = first_ten + remaining_books
+    return reordered_books
 
