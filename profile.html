@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Virtual Bible</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .profile-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 600px;
+            padding: 20px;
+            text-align: center
+        }
+
+        h1 {
+            text-align: center;
+            color: #2d6a4f;
+        }
+
+        .profile-section {
+            margin-bottom: 20px;
+        }
+
+        .profile-section h2 {
+            color: #2d6a4f;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .profile-section p {
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .bookmarks {
+            margin-top: 20px;
+        }
+
+        .bookmarks h3 {
+            font-size: 20px;
+            color: #2d6a4f;
+        }
+
+        .bookmark {
+            background-color: #f1f1f1;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .bookmark p {
+            margin: 0;
+        }
+
+
+
+        .back-link:hover {
+            background-color: #1e4d37;
+        }
+
+        button {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #2d6a4f;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .back-button {
+            margin-top: 10px;
+            display: block;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="profile-container">
+        <h1>User Profile</h1>
+
+        <div class="profile-section">
+            <p><strong>Username:</strong> {{ user_data.username }}</p>
+            <p><strong>Streak:</strong> {{ user_data.streak }}</p>
+            <p><strong>Last Read Position:</strong> {{ user_data.last_read_position if user_data.last_read_position else "Not Set" }}</p>
+        </div>
+
+        {% if user_data.bookmarks %}
+            <div class="bookmarks">
+                <h3>Bookmarks</h3>
+                {% for bookmark in user_data.bookmarks %}
+                    <div class="bookmark">
+                        <p><strong>Book:</strong> {{ bookmark.book }}</p>
+                        <p><strong>Chapter:</strong> {{ bookmark.chapter }}</p>
+                        <p><strong>Verse:</strong> {{ bookmark.verse }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No bookmarks available.</p>
+        {% endif %}
+
+        <div class="back-button">
+            <button onclick="window.history.back()">Back</button>
+        </div>
+    </div>
+
+</body>
+</html>
