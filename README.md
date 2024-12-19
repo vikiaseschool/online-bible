@@ -2,7 +2,7 @@
 
 ## Overview
 
-Virtual Bible is a web application that allows users to read the Bible, bookmark verses, and maintain a reading streak. Users can either read as a guest or log in to access additional features like bookmarking and profile management.
+Virtual Bible is a web application that allows users to read the Bible, bookmark verses, and maintain a reading streak. Users can either read as a guest or log in to access additional features like bookmarking and streaks.
 
 ## Use of AI
 I used github copilot and chat GPT for optimalizing some parts of my code, I had to rewrite some parts of javascript.
