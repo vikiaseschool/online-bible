@@ -126,6 +126,24 @@
         .profile a:hover {
             background-color: #1e4d37;
         }
+
+        .back-button {
+            text-decoration: none;
+            color: white;
+            background-color: #2d6a4f;
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 5px;
+            display: inline-block;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+            margin-left: 10px;
+        }
+
+        .back-button:hover {
+            background-color: #1e4d37;
+        }
     </style>
     <script>
         function fetchBibleText(book, chapter = null, verse = null) {
@@ -175,6 +193,9 @@
                     const bookmarkIcon = document.createElement('span');
                     bookmarkIcon.className = 'bookmark-icon';
                     bookmarkIcon.innerHTML = '&#10084;';
+                    bookmarkIcon.setAttribute('data-book', bookName);
+                    bookmarkIcon.setAttribute('data-chapter', chapter.chapter);
+                    bookmarkIcon.setAttribute('data-verse', verse.verse);
                     bookmarkIcon.onclick = () => toggleBookmark(bookName, chapter.chapter, verse.verse, bookmarkIcon);
                     verseDiv.appendChild(bookmarkIcon);
 
@@ -183,7 +204,10 @@
 
                 bibleTextDiv.appendChild(chapterDiv);
             });
+
+            loadBookmarks();
         }
+
 
         function toggleBookmark(book, chapter, verse, iconElement) {
             const username = "{{ username }}";
@@ -210,7 +234,6 @@
             .then(data => {
                 if (data.success) {
                     iconElement.classList.add('saved');
-                    alert(data.message);
                 } else {
                     console.error('Error:', data.message);
                 }
@@ -234,7 +257,6 @@
             .then(data => {
                 if (data.success) {
                     iconElement.classList.remove('saved');
-                    alert(data.message);
                 } else {
                     console.error('Error:', data.message);
                 }
@@ -243,6 +265,29 @@
                 console.error('Error:', error);
             });
         }
+
+        function loadBookmarks() {
+            const username = "{{ username }}";
+
+            fetch(`/get-bookmarks?username=${username}`)
+                .then(response => response.json())
+                .then(data => {
+                    const bookmarks = data;
+
+                    bookmarks.forEach(bookmark => {
+                        const book = bookmark.book;
+                        const chapter = bookmark.chapter;
+                        const verse = bookmark.verse;
+
+                        const icon = document.querySelector(`.bookmark-icon[data-book="${book}"][data-chapter="${chapter}"][data-verse="${verse}"]`);
+                        if (icon) {
+                            icon.classList.add('saved');
+                        }
+                    });
+                })
+                .catch(error => console.error('Error loading bookmarks:', error));
+        }
+
     </script>
 </head>
 <body>
@@ -255,6 +300,7 @@
         </ul>
         <div class="profile">
             <a href="/profile?username={{ username }}">View Profile</a>
+            <a href="javascript:history.back()" class="back-button">Log Out</a>
         </div>
     </div>
 
