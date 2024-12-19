@@ -5,6 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <style>
+        /* Styles for the modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -16,7 +53,6 @@
             text-align: center;
             margin-bottom: 20px;
         }
-
 
         .container {
             max-width: 400px;
@@ -36,9 +72,17 @@
             text-align: center;
             color: #2d6a4f;
         }
+
         p {
             text-align: center;
             color: #2d6a4f;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+            text-align: center;
         }
 
         form {
@@ -126,6 +170,14 @@
         }
     </style>
     <script>
+        function openModal() {
+            document.getElementById("demoModal").style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById("demoModal").style.display = "none";
+        }
+
         function toggleForms() {
             var loginForm = document.getElementById('login-form');
             var registerForm = document.getElementById('register-form');
@@ -133,13 +185,11 @@
             var button = document.getElementById('toggle-button');
 
             if (loginForm.classList.contains('hidden')) {
-                // Show login, hide register
                 loginForm.classList.remove('hidden');
                 registerForm.classList.add('hidden');
                 title.innerText = 'Login';
                 button.innerText = 'Switch to Register';
             } else {
-                // Show register, hide login
                 loginForm.classList.add('hidden');
                 registerForm.classList.remove('hidden');
                 title.innerText = 'Register';
@@ -167,6 +217,13 @@
     </div>
     <div class="container">
         <h2 id="form-title">Login</h2>
+
+        <!-- Error message section -->
+        {% if error %}
+            <div id="error-message" class="error-message">{{ error }}</div>
+        {% else %}
+            <div id="error-message" class="error-message" style="display: none;"></div>
+        {% endif %}
 
         <form id="login-form" method="POST" action="/login">
             <label for="username">Username</label>
@@ -197,9 +254,18 @@
         <div class="switch">
             <button id="toggle-button" onclick="toggleForms()">Switch to Register</button>
         </div>
-        <h4> demo credentials </h4>
-        <p>username: demo</p>
-        <p>password: pass1234</p>
+
+        <h4><button onclick="openModal()">Demo Credentials</button></h4>
+
+        <div id="demoModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <h4>Show Demo Credentials</h4>
+                <p><strong>Username:</strong> demo</p>
+                <p><strong>Password:</strong> pass1234</p>
+            </div>
+        </div>
+
         <div class="back-button">
             <button onclick="window.history.back()">Back</button>
         </div>
