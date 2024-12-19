@@ -106,11 +106,14 @@
             <div class="bookmarks">
                 <h3>Bookmarks</h3>
                 {% for bookmark in user_data.bookmarks %}
-                    <div class="bookmark" data-id="{{ bookmark.id }}">
+                    <div class="bookmark" data-id="{{ bookmark.id }}"
+                        data-book="{{ bookmark.book }}"
+                        data-chapter="{{ bookmark.chapter }}"
+                        data-verse="{{ bookmark.verse }}">
                         <p><strong>Book:</strong> {{ bookmark.book }}</p>
                         <p><strong>Chapter:</strong> {{ bookmark.chapter }} <strong>Verse:</strong> {{ bookmark.verse }}</p>
                         <p>{{ bookmark.text }}</p>
-                        <button class="delete-bookmark" data-id="{{ bookmark.id }}" onclick="deleteBookmark({{ bookmark.id }})">Delete</button>
+                        <button class="delete-bookmark" onclick="deleteBookmark('{{ bookmark.book }}', {{ bookmark.chapter }}, '{{ bookmark.verse }}')">Delete</button>
                     </div>
                 {% endfor %}
             </div>
@@ -126,21 +129,37 @@
 </body>
 
 <script>
-    function deleteBookmark(id) {
-        fetch(`/delete-bookmark/${id}`, {
+    function deleteBookmark(book, chapter, verse) {
+        const username = "{{ user_data.username }}";
+
+        const requestData = {
+            username: username,
+            book: book,
+            chapter: chapter,
+            verse: verse
+        };
+
+        fetch('/delete-bookmark', {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
             },
+            body: JSON.stringify(requestData)
         })
         .then(response => response.json())
         .then(data => {
-            alert('Bookmark deleted successfully');
-            document.querySelector(`.bookmark[data-id="${id}"]`).remove();
-            window.location.reload();
+            if (data.success) {
+                const bookmarkElement = document.querySelector(`.bookmark[data-book="${book}"][data-chapter="${chapter}"][data-verse="${verse}"]`);
+                if (bookmarkElement) {
+                    bookmarkElement.remove();
+                }
+            } else {
+                alert('Error deleting bookmark: ' + data.message);
+            }
         })
         .catch(error => {
             console.error('Error:', error);
+            alert('Error deleting bookmark.');
         });
     }
 </script>
