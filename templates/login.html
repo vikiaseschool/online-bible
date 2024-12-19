@@ -78,6 +78,13 @@
             color: #2d6a4f;
         }
 
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+            text-align: center;
+        }
+
         form {
             display: flex;
             flex-direction: column;
@@ -211,6 +218,13 @@
     <div class="container">
         <h2 id="form-title">Login</h2>
 
+        <!-- Error message section -->
+        {% if error %}
+            <div id="error-message" class="error-message">{{ error }}</div>
+        {% else %}
+            <div id="error-message" class="error-message" style="display: none;"></div>
+        {% endif %}
+
         <form id="login-form" method="POST" action="/login">
             <label for="username">Username</label>
             <input type="text" id="username" name="username" placeholder="Enter your username" required>
@@ -243,7 +257,6 @@
 
         <h4><button onclick="openModal()">Demo Credentials</button></h4>
 
-        <!-- The Modal -->
         <div id="demoModal" class="modal">
             <div class="modal-content">
                 <span class="close" onclick="closeModal()">&times;</span>
