@@ -9,12 +9,6 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 db = SQLAlchemy(app)
 
-#DODELAT BOOKMARKS SYSTEM
-    #bookmarknout verse - ulozit do db
-    #zobrazit v profilu vsecny bookmarky
-    #moznost smazat bookmark
-    #moznost zobrazit verse z bookmarku - prejit do spravne knihy - kapitoly a zvyraznit vers.
-
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
@@ -108,7 +102,7 @@ def add_bookmark():
     new_bookmark = Bookmark(book=book, chapter=chapter, verse=verse, user_id=user.id, text=text)
     db.session.add(new_bookmark)
     db.session.commit()
-    return jsonify({'message': f'Bookmark added for {book} {chapter}:{verse} by {username}'}), 200
+    return jsonify({'success': True, 'message': f'Bookmark added for {book} {chapter}:{verse} by {username}'}), 200
 
 
 @app.route('/get-bookmarks', methods=['GET'])
@@ -130,16 +124,33 @@ def get_bookmarks():
     ]
     return jsonify(bookmarks)
 
-@app.route('/delete-bookmark/<int:id>', methods=['DELETE'])
-def delete_bookmark(id):
-    bookmark = Bookmark.query.get(id)
+
+#this needs a rework!!!!
+@app.route('/delete-bookmark', methods=['DELETE'])
+def delete_bookmark():
+    # Get the parameters from the request
+    data = request.get_json()
+    username = data.get('username')
+    book = data.get('book')
+    chapter = data.get('chapter')
+    verse = data.get('verse')
+
+    # Ensure the user exists
+    user = get_user_by_username(username)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Find the bookmark in the user's bookmarks
+    bookmark = next((b for b in user.bookmarks if b.book == book and b.chapter == chapter and b.verse == verse), None)
+
     if not bookmark:
         return jsonify({"error": "Bookmark not found"}), 404
 
+    # Delete the bookmark
     db.session.delete(bookmark)
     db.session.commit()
-    return jsonify({"message": "Bookmark deleted successfully"}), 200
 
+    return jsonify({'success': True, 'message': 'Bookmark deleted successfully'}), 200
 
 @app.route('/')
 def index():
@@ -193,6 +204,7 @@ def view_profile():
     username = request.args.get('username')
     user_data = get_user_data(username)
     return render_template('profile.html', user_data=user_data)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
