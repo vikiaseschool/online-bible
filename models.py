@@ -84,7 +84,7 @@ def get_bible_section(book, chapter=None, verse=None):
     return 'Not Found.'
 
 def get_book_names_from_file():
-    with open('full_bible.json', 'r', encoding='utf-8') as f:
+    with open('/home/vikiase/online-bible/full_bible.json', 'r', encoding='utf-8') as f:
         bible_data = json.load(f)
     book_names = [book['name'] for book in bible_data['books']]
     custom_order = [
