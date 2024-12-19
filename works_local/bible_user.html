@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Bible</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .sidebar {
+            width: 20%;
+            float: left;
+            background-color: #2d6a4f;
+            color: white;
+            padding: 20px;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar li {
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            background-color: #1e4d37;
+            border-radius: 5px;
+            display: block;
+        }
+
+        .sidebar a:hover {
+            background-color: #2d6a4f;
+        }
+
+        .content {
+            margin-left: 22%;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .bible-text {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .bible-text p {
+            font-size: 16px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .chapter {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .chapter h3 {
+            margin-top: 0;
+            color: #2d6a4f;
+        }
+
+        .verse {
+            margin-bottom: 10px;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .verse-text {
+            flex: 1;
+            padding-right: 10px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .bookmark-icon {
+            cursor: pointer;
+            font-size: 24px;
+            color: #ccc;
+            transition: color 0.3s ease;
+        }
+
+        .bookmark-icon.saved {
+            color: #e63946;
+        }
+
+        .profile {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .profile a {
+            text-decoration: none;
+            color: white;
+            background-color: #2d6a4f;
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 5px;
+            display: inline-block;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        .profile a:hover {
+            background-color: #1e4d37;
+        }
+
+        .back-button {
+            text-decoration: none;
+            color: white;
+            background-color: #2d6a4f;
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 5px;
+            display: inline-block;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+            margin-left: 10px;
+        }
+
+        .back-button:hover {
+            background-color: #1e4d37;
+        }
+    </style>
+    <script>
+        function fetchBibleText(book, chapter = null, verse = null) {
+            let url = `/bible-text?book=${book}`;
+            if (chapter) {
+                url += `&chapter=${chapter}`;
+            }
+            if (verse) {
+                url += `&verse=${verse}`;
+            }
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    displayBibleText(data.text, book);
+                })
+                .catch(error => {
+                    document.getElementById('bible-text').innerText = 'Error fetching Bible text.';
+                });
+        }
+
+        function displayBibleText(bibleData, bookName) {
+            const bibleTextDiv = document.getElementById('bible-text');
+            const bookTitle = document.getElementById('book-title');
+
+            bookTitle.innerText = bookName;
+
+            bibleTextDiv.innerHTML = '';
+
+            bibleData.chapters.forEach(chapter => {
+                const chapterDiv = document.createElement('div');
+                chapterDiv.className = 'chapter';
+
+                const chapterHeader = document.createElement('h3');
+                chapterHeader.innerText = `Chapter ${chapter.chapter}`;
+                chapterDiv.appendChild(chapterHeader);
+
+                chapter.verses.forEach(verse => {
+                    const verseDiv = document.createElement('div');
+                    verseDiv.className = 'verse';
+
+                    const verseText = document.createElement('span');
+                    verseText.className = 'verse-text';
+                    verseText.innerText = verse.text.trim();
+                    verseDiv.appendChild(verseText);
+
+                    const bookmarkIcon = document.createElement('span');
+                    bookmarkIcon.className = 'bookmark-icon';
+                    bookmarkIcon.innerHTML = '&#10084;';
+                    bookmarkIcon.setAttribute('data-book', bookName);
+                    bookmarkIcon.setAttribute('data-chapter', chapter.chapter);
+                    bookmarkIcon.setAttribute('data-verse', verse.verse);
+                    bookmarkIcon.onclick = () => toggleBookmark(bookName, chapter.chapter, verse.verse, bookmarkIcon);
+                    verseDiv.appendChild(bookmarkIcon);
+
+                    chapterDiv.appendChild(verseDiv);
+                });
+
+                bibleTextDiv.appendChild(chapterDiv);
+            });
+
+            loadBookmarks();
+        }
+
+
+        function toggleBookmark(book, chapter, verse, iconElement) {
+            const username = "{{ username }}";
+            const isBookmarked = iconElement.classList.contains('saved');
+
+            if (isBookmarked) {
+                deleteBookmark(book, chapter, verse, iconElement);
+            } else {
+                addBookmark(book, chapter, verse, iconElement);
+            }
+        }
+
+        function addBookmark(book, chapter, verse, iconElement) {
+            const username = "{{ username }}";
+
+            fetch('/add-bookmark', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, book, chapter, verse }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    iconElement.classList.add('saved');
+                } else {
+                    console.error('Error:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function deleteBookmark(book, chapter, verse, iconElement) {
+            const username = "{{ username }}";
+
+            fetch('/delete-bookmark', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, book, chapter, verse }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    iconElement.classList.remove('saved');
+                } else {
+                    console.error('Error:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function loadBookmarks() {
+            const username = "{{ username }}";
+
+            fetch(`/get-bookmarks?username=${username}`)
+                .then(response => response.json())
+                .then(data => {
+                    const bookmarks = data;
+
+                    bookmarks.forEach(bookmark => {
+                        const book = bookmark.book;
+                        const chapter = bookmark.chapter;
+                        const verse = bookmark.verse;
+
+                        const icon = document.querySelector(`.bookmark-icon[data-book="${book}"][data-chapter="${chapter}"][data-verse="${verse}"]`);
+                        if (icon) {
+                            icon.classList.add('saved');
+                        }
+                    });
+                })
+                .catch(error => console.error('Error loading bookmarks:', error));
+        }
+
+    </script>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Select Book</h2>
+        <ul>
+            {% for book in books %}
+                <li><a href="javascript:void(0);" onclick="fetchBibleText('{{ book }}')">{{ book }}</a></li>
+            {% endfor %}
+        </ul>
+        <div class="profile">
+            <a href="/profile?username={{ username }}">View Profile</a>
+            <a href="javascript:history.back()" class="back-button">Log Out</a>
+        </div>
+    </div>
+
+    <div class="content">
+        <h1 id="book-title">Read the Virtual Bible</h1>
+        <div class="bible-text" id="bible-text">
+            <p>Select a book to read.</p>
+        </div>
+    </div>
+</body>
+</html>
