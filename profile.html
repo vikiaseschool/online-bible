@@ -74,6 +74,7 @@
         .back-link:hover {
             background-color: #1e4d37;
         }
+
         button {
             padding: 10px;
             border: none;
@@ -83,6 +84,7 @@
             font-size: 16px;
             cursor: pointer;
         }
+
         .back-button {
             margin-top: 10px;
             display: block;
@@ -104,10 +106,11 @@
             <div class="bookmarks">
                 <h3>Bookmarks</h3>
                 {% for bookmark in user_data.bookmarks %}
-                    <div class="bookmark">
+                    <div class="bookmark" data-id="{{ bookmark.id }}">
                         <p><strong>Book:</strong> {{ bookmark.book }}</p>
                         <p><strong>Chapter:</strong> {{ bookmark.chapter }} <strong>Verse:</strong> {{ bookmark.verse }}</p>
                         <p>{{ bookmark.text }}</p>
+                        <button class="delete-bookmark" data-id="{{ bookmark.id }}" onclick="deleteBookmark({{ bookmark.id }})">Delete</button>
                     </div>
                 {% endfor %}
             </div>
@@ -121,4 +124,25 @@
     </div>
 
 </body>
+
+<script>
+    function deleteBookmark(id) {
+        fetch(`/delete-bookmark/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert('Bookmark deleted successfully');
+            document.querySelector(`.bookmark[data-id="${id}"]`).remove();
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+</script>
+
 </html>
