@@ -42,7 +42,7 @@ def get_verse_for_today():
     return verse_today
 
 def load_bible():
-    with open('full_bible.json', 'r', encoding='utf-8') as file:
+    with open('/home/vikiase/online-bible/full_bible.json', 'r', encoding='utf-8') as file:
         return json.load(file)
 
 
