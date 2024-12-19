@@ -83,6 +83,7 @@ def add_streak(username):
     else:
         return None
 
+
 @app.route('/add-bookmark', methods=['POST'])
 def add_bookmark():
     data = request.json
@@ -99,9 +100,14 @@ def add_bookmark():
     if not user:
         return jsonify({'message': 'User not found'}), 404
 
+    existing_bookmark = Bookmark.query.filter_by(user_id=user.id, book=book, chapter=chapter, verse=verse).first()
+    if existing_bookmark:
+        return
+
     new_bookmark = Bookmark(book=book, chapter=chapter, verse=verse, user_id=user.id, text=text)
     db.session.add(new_bookmark)
     db.session.commit()
+
     return jsonify({'success': True, 'message': f'Bookmark added for {book} {chapter}:{verse} by {username}'}), 200
 
 
@@ -125,31 +131,31 @@ def get_bookmarks():
     return jsonify(bookmarks)
 
 
-#this needs a rework!!!!
-@app.route('/delete-bookmark', methods=['DELETE'])
+@app.route('/delete-bookmark', methods=['DELETE', 'OPTIONS'])
 def delete_bookmark():
-    # Get the parameters from the request
+    if request.method == 'OPTIONS':
+        return jsonify({"message": "CORS preflight check passed"}), 200
+
     data = request.get_json()
     username = data.get('username')
-    book = data.get('book')
-    chapter = data.get('chapter')
-    verse = data.get('verse')
+    book = str(data.get('book'))
+    chapter = int(data.get('chapter'))
+    verse = str(data.get('verse'))
 
-    # Ensure the user exists
     user = get_user_by_username(username)
     if not user:
         return jsonify({"error": "User not found"}), 404
-
-    # Find the bookmark in the user's bookmarks
-    bookmark = next((b for b in user.bookmarks if b.book == book and b.chapter == chapter and b.verse == verse), None)
+    bookmark = None
+    for b in user.bookmarks:
+        if b.book.strip().lower() == book.strip().lower() and b.chapter == chapter and b.verse == verse:
+            bookmark = b
+            break
 
     if not bookmark:
         return jsonify({"error": "Bookmark not found"}), 404
 
-    # Delete the bookmark
     db.session.delete(bookmark)
     db.session.commit()
-
     return jsonify({'success': True, 'message': 'Bookmark deleted successfully'}), 200
 
 @app.route('/')
@@ -226,7 +232,7 @@ def register():
     if request.method == 'POST':
         new_username = request.form.get('new-username')
         new_password = request.form['new-password']
-        hashed_password = generate_password_hash(new_password, method='pbkdf2:sha256')
+        hashed_password = generate_password_hash(new_password, method='####')
 
         if user_exists(new_username):
             return render_template('login.html', error="Username already exists.")
