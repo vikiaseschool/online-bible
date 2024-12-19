@@ -232,7 +232,7 @@ def register():
     if request.method == 'POST':
         new_username = request.form.get('new-username')
         new_password = request.form['new-password']
-        hashed_password = generate_password_hash(new_password, method='####')
+        hashed_password = generate_password_hash(new_password, method='pbkdf2:sha256')
 
         if user_exists(new_username):
             return render_template('login.html', error="Username already exists.")
