@@ -1,47 +1,45 @@
-import requests
 import random
 import json
 
+
 #vraci dict: {"text": "text", "reference": "reference"}
 def get_verse_for_today():
-    def get_random_verse_from_key_books():
-        key_books_with_chapters = {
-            "Genesis": 50,
-            "Exodus": 40,
-            "Psalms": 150,
-            "Isaiah": 66,
-            "Matthew": 28,
-            "John": 21,
-            "Acts": 28,
-            "Romans": 16,
-            "Revelation": 22
-        }
-        verses = []
+    key_books_with_chapters = {
+        "Genesis": 50,
+        "Exodus": 40,
+        "Psalms": 150,
+        "Isaiah": 66,
+        "Matthew": 28,
+        "John": 21,
+        "Acts": 28,
+        "Romans": 16,
+        "Revelation": 22
+    }
 
-        for book, max_chapter in key_books_with_chapters.items():
-            chapter = random.randint(1, max_chapter)
-            verse = random.randint(1, 50)
+    verses = []
+    bible = load_bible()
 
-            url = f"https://bible-api.com/{book} {chapter}:{verse}"
-            response = requests.get(url)
+    for book, max_chapter in key_books_with_chapters.items():
+        chapter = random.randint(1, max_chapter)  # Select a random chapter
+        book_data = next((item for item in bible['books'] if item['name'] == book), None)
 
-            if response.status_code == 200:
-                data = response.json()
+        if book_data:
+            chapter_data = next((item for item in book_data['chapters'] if item['chapter'] == chapter), None)
+            if chapter_data:
+                max_verse = len(chapter_data['verses'])  # Get the number of verses in the selected chapter
+                verse_number = random.randint(1, max_verse)  # Select a random verse number
+                verse_data = chapter_data['verses'][verse_number - 1]  # Index is zero-based
+
                 verses.append({
-                    "text": data.get("text", "Verse not found"),
-                    "reference": data.get("reference", f"{book} {chapter}:{verse}")
+                    "text": verse_data.get("text", "Verse not found"),
+                    "reference": f"{book} {chapter}:{verse_number}"
                 })
-            else:
-                continue
-        return random.choice(verses)
-
-    verse_of_the_day = get_random_verse_from_key_books()
-
-    if verse_of_the_day:
-        verse_of_the_day['text'] = verse_of_the_day['text'][:-2]
-        return verse_of_the_day
-    else:
-        print("Failed to retrieve the verse of the day.")
+    verse_today = random.choice(verses) if verses else None
+    verse_today["text"] = verse_today["text"].replace(";", "").replace("’", "").replace("‘", "").replace(
+        "”", "").replace("“", "").replace("⌞", "").replace("⌜", "").replace("⌟",
+                                                                            "").replace(
+        "⌝", "").replace("—", "")
+    return verse_today
 
 def load_bible():
     with open('full_bible.json', 'r', encoding='utf-8') as file:
@@ -85,7 +83,6 @@ def get_bible_section(book, chapter=None, verse=None):
                                     return v
     return 'Not Found.'
 
-
 def get_book_names_from_file():
     with open('full_bible.json', 'r', encoding='utf-8') as f:
         bible_data = json.load(f)
@@ -98,4 +95,6 @@ def get_book_names_from_file():
     remaining_books = [book for book in book_names if book not in first_ten]
     reordered_books = first_ten + remaining_books
     return reordered_books
+
+
 
