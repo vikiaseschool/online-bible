@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Bible</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .sidebar {
+            width: 20%;
+            float: left;
+            background-color: #2d6a4f;
+            color: white;
+            padding: 20px;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar li {
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            background-color: #1e4d37;
+            border-radius: 5px;
+            display: block;
+        }
+
+        .sidebar a:hover {
+            background-color: #2d6a4f;
+        }
+
+        .content {
+            margin-left: 22%;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .bible-text {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .bible-text p {
+            font-size: 16px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .chapter {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .chapter h3 {
+            margin-top: 0;
+            color: #2d6a4f;
+        }
+
+        .verse {
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .login {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .login a {
+            text-decoration: none;
+            color: white;
+            background-color: #2d6a4f;
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 5px;
+            display: inline-block;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        .login a:hover {
+            background-color: #1e4d37;
+        }
+    </style>
+    <script>
+        function fetchBibleText(book, chapter = null, verse = null) {
+            let url = `/bible-text?book=${book}`;
+            if (chapter) {
+                url += `&chapter=${chapter}`;
+            }
+            if (verse) {
+                url += `&verse=${verse}`;
+            }
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    displayBibleText(data.text, book);
+                })
+                .catch(error => {
+                    document.getElementById('bible-text').innerText = 'Error fetching Bible text.';
+                });
+        }
+        function displayBibleText(bibleData, bookName) {
+            const bibleTextDiv = document.getElementById('bible-text');
+            const bookTitle = document.getElementById('book-title');
+
+            bookTitle.innerText = bookName;
+
+            bibleTextDiv.innerHTML = '';
+
+            bibleData.chapters.forEach(chapter => {
+                const chapterDiv = document.createElement('div');
+                chapterDiv.className = 'chapter';
+
+                const chapterHeader = document.createElement('h3');
+                chapterHeader.innerText = `Chapter ${chapter.chapter}`;
+                chapterDiv.appendChild(chapterHeader);
+
+                chapter.verses.forEach(verse => {
+                    const verseDiv = document.createElement('div');
+                    verseDiv.className = 'verse';
+                    verseDiv.innerText = verse.text.trim();   
+                    chapterDiv.appendChild(verseDiv);
+                });
+
+                bibleTextDiv.appendChild(chapterDiv);
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Select Book</h2>
+        <ul>
+            {% for book in books %}
+                <li><a href="javascript:void(0);" onclick="fetchBibleText('{{ book }}')">{{ book }}</a></li>
+            {% endfor %}
+        </ul>
+        <div class="login">
+            <a href="/login">Login</a>
+        </div>
+    </div>
+
+    <div class="content">
+        <h1 id="book-title">Read the Virtual Bible</h1>
+        <div class="bible-text" id="bible-text">
+            <p>Select a book to read.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Virtual Bible</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #2d6a4f;
+            color: white;
+            padding: 20px 0;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 36px;
+        }
+
+        .content {
+            margin-top: 50px;
+        }
+
+        .banner {
+            width: 704px;
+            height: 320px;
+            margin: 0 auto;
+            background-image: url('static/banner.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .buttons {
+            margin-top: 20px;
+        }
+
+        .buttons a {
+            text-decoration: none;
+            color: white;
+            background-color: #2d6a4f;
+            padding: 15px 30px;
+            margin: 10px;
+            border-radius: 5px;
+            font-size: 18px;
+        }
+
+        .buttons a:hover {
+            background-color: #1e4d37;
+        }
+
+        .verse-of-the-day {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #e9ecef;
+            font-size: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Welcome to Virtual Bible</h1>
+    </header>
+
+    <div class="content">
+        <div class="banner"></div>
+
+        <div class="buttons">
+            <a href="/login">Login/Register</a>
+            <a href="/guest">Read as a Guest</a>
+        </div>
+
+        <div class="verse-of-the-day">
+            <p><strong>Verse of the Day:</strong> "{{ verse['text'] }}" - {{ verse['reference'] }}</p>
+        </div>
+    </div>
+
+</body>
+</html>
