@@ -33,7 +33,7 @@ I used github copilot and chat GPT for optimalizing some parts of my code, I had
 
 ## License
 
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+This project is licensed under the MIT License. 
 
 ## Acknowledgements
 
