@@ -23,7 +23,9 @@
             width: 80%;
             max-width: 600px;
             padding: 20px;
-            text-align: center
+            text-align: center;
+            overflow: auto;
+            min-height: 400px;
         }
 
         h1 {
@@ -48,6 +50,8 @@
 
         .bookmarks {
             margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
         }
 
         .bookmarks h3 {
@@ -67,12 +71,9 @@
             margin: 0;
         }
 
-
-
         .back-link:hover {
             background-color: #1e4d37;
         }
-
         button {
             padding: 10px;
             border: none;
@@ -97,7 +98,6 @@
         <div class="profile-section">
             <p><strong>Username:</strong> {{ user_data.username }}</p>
             <p><strong>Streak:</strong> {{ user_data.streak }}</p>
-            <p><strong>Last Read Position:</strong> {{ user_data.last_read_position if user_data.last_read_position else "Not Set" }}</p>
         </div>
 
         {% if user_data.bookmarks %}
@@ -106,8 +106,8 @@
                 {% for bookmark in user_data.bookmarks %}
                     <div class="bookmark">
                         <p><strong>Book:</strong> {{ bookmark.book }}</p>
-                        <p><strong>Chapter:</strong> {{ bookmark.chapter }}</p>
-                        <p><strong>Verse:</strong> {{ bookmark.verse }}</p>
+                        <p><strong>Chapter:</strong> {{ bookmark.chapter }} <strong>Verse:</strong> {{ bookmark.verse }}</p>
+                        <p>{{ bookmark.text }}</p>
                     </div>
                 {% endfor %}
             </div>
