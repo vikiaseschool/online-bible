@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bible as a Guest</title>
+    <title>Virtual Bible</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -125,18 +125,14 @@
                     document.getElementById('bible-text').innerText = 'Error fetching Bible text.';
                 });
         }
-
         function displayBibleText(bibleData, bookName) {
             const bibleTextDiv = document.getElementById('bible-text');
             const bookTitle = document.getElementById('book-title');
 
-            // Set the book title
             bookTitle.innerText = bookName;
 
-            // Clear previous content
             bibleTextDiv.innerHTML = '';
 
-            // Loop through chapters and verses
             bibleData.chapters.forEach(chapter => {
                 const chapterDiv = document.createElement('div');
                 chapterDiv.className = 'chapter';
@@ -148,7 +144,7 @@
                 chapter.verses.forEach(verse => {
                     const verseDiv = document.createElement('div');
                     verseDiv.className = 'verse';
-                    verseDiv.innerText = verse.text.trim();  // Just display the verse text
+                    verseDiv.innerText = verse.text.trim();   
                     chapterDiv.appendChild(verseDiv);
                 });
 
